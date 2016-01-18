@@ -15,19 +15,35 @@ Serial::~Serial()
 
 int Serial::sread(char *buffer, int bytes)
 {
+#ifdef __linux
 	return read(portHandle, buffer, bytes);
+#elif _WIN32
+    int bytesRead;
+    int result = ReadFile(portHandle, buffer, bytes, (LPDWORD)&bytesRead, 0);
+    return bytesRead;
+#endif
 }
 
 int Serial::swrite(char *buffer, int bytes)
 {
+#ifdef __linux
 	return write(portHandle, buffer, bytes);
+#elif _WIN32
+    int bytesWritten;
+    int result = WriteFile(portHandle, buffer, bytes, (LPDWORD)&bytesWritten, 0);
+    return bytesWritten;
+#endif
 }
 
 bool Serial::sclose()
 {
 	if (portHandle)
-	{
+    {
+#ifdef __linux
 		close(portHandle);
+#elif _WIN32
+        CloseHandle(portHandle);
+#endif
 		return true;
 	}
 	else
@@ -97,7 +113,7 @@ int Serial::queryBuffer()
 #elif _WIN32
 bool Serial::sopen()
 {
-	portHandle = CreateFile(
+    portHandle = CreateFileA(
 			portName.c_str(),
 			GENERIC_READ | GENERIC_WRITE,
 			0,
@@ -118,19 +134,19 @@ bool Serial::configure()
 	DCB config = {0};
 	config.DCBlength = sizeof(config);
 
-	if (GetCommState(port_handle, &config) == 0) {
+    if (GetCommState(portHandle, &config) == 0) {
 		printf("Unable to get configuration of port. Error: %d", GetLastError());
 		return false;
 	}
 
-	config.BaudRate = baudrate;
+    config.BaudRate = baudRate;
 	config.StopBits = ONESTOPBIT;
 	config.Parity = NOPARITY;
 	config.ByteSize = 8;
 	config.fDtrControl = 0;
 	config.fRtsControl = 0;
 
-	if (SetCommState(port_handle, &config) == 0) {
+    if (SetCommState(portHandle, &config) == 0) {
 		printf("failed to set port configuration. Error: %d\n", GetLastError());
 		return false;
 	}
