@@ -15,10 +15,21 @@ Packetizer::~Packetizer()
 	delete port;
 }
 
+bool Packetizer::open()
+{
+    return port->sopen();
+}
+
+bool Packetizer::close()
+{
+    return port->sclose();
+}
+
 int Packetizer::readPacket(char *buffer)
 {
 	char byte;
 	bool complete = false;
+    error = ERR_NO_ERROR;
 
 	while (error == ERR_NO_ERROR && !complete)
 	{
@@ -67,7 +78,8 @@ int Packetizer::readPacket(char *buffer)
 	}
 
 	if (complete)
-	{
+    {
+        currentState = NO_STATE;
 		return packetSize; //always positive or 0
 	}
 	else
@@ -82,6 +94,7 @@ int Packetizer::writePacket(char *buffer, int bytes)
 	char *newBuffer = new char[bytes+2];
 	newBuffer[0] = control;
 	newBuffer[1] = bytes;
+    memcpy(&(newBuffer[2]), buffer, bytes);
 	int written = port->swrite(newBuffer, bytes+2);
 	delete newBuffer;
 

@@ -1,5 +1,5 @@
 #include "include/Serial.hpp"
-
+#include <string.h>
 
 
 class Packetizer
@@ -23,6 +23,9 @@ public:
 
 	int readPacket(char *buffer); //Attempts to read a packet off the serial port
 	int writePacket(char *buffer, int bytes); //Writes a packet to the serial port
+
+    bool open();
+    bool close();
 	
 	int queryBuffer(); //Queries number of bytes available on the serial port
 	Packetizer_Error getCurrentError();
