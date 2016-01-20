@@ -21,8 +21,10 @@ public:
 	Packetizer(string portName = "", char control = '!', int baudRate = 115200);
 	~Packetizer();
 
-	int readPacket(char *buffer); //Attempts to read a packet off the serial port
-	int writePacket(char *buffer, int bytes); //Writes a packet to the serial port
+    int readPacket(char *buffer); //Attempts to read a packet off the serial port
+    int writePacket(char *buffer, int bytes); //Writes a packet to the serial port
+    int readRaw(char *buffer, int maxBytes); //Attempts to read all data off the serial port
+    int writeRaw(char *buffer, int bytes); //Writes all specified bytes to the serial port
 
     bool open();
     bool close();

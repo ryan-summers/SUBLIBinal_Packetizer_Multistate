@@ -38,19 +38,19 @@ int Packetizer::readPacket(char *buffer)
 			case NO_STATE:
 				if (port->queryBuffer())
 				{
-					port->sread(&byte, 1);
-					error = ERR_NO_ERROR;
+                    port->sread(&byte, 1);
+
+                    if (byte == control)
+                    {
+                        currentState = READ_CTRL;
+                        error = ERR_NO_ERROR;
+                    }
+                    else
+                        error = ERR_INVALID_CTRL;
 				}
 				else
 					error = ERR_NOT_ENOUGH_DATA;
 
-				if (byte == control)
-				{
-					currentState = READ_CTRL;
-					error = ERR_NO_ERROR;
-				}
-				else
-					error = ERR_INVALID_CTRL;
 				break;
 
 			case READ_CTRL:
@@ -89,6 +89,16 @@ int Packetizer::readPacket(char *buffer)
 	}
 }
 
+int Packetizer::readRaw(char *buffer, int maxBytes)
+{
+    int bytesAvailable = port->queryBuffer();
+
+    if (bytesAvailable < maxBytes)
+        return port->sread(buffer, bytesAvailable);
+    else
+        return port->sread(buffer, maxBytes);
+}
+
 int Packetizer::writePacket(char *buffer, int bytes)
 {
 	char *newBuffer = new char[bytes+2];
@@ -99,6 +109,11 @@ int Packetizer::writePacket(char *buffer, int bytes)
 	delete newBuffer;
 
 	return written;
+}
+
+int Packetizer::writeRaw(char *buffer, int bytes)
+{
+    return port->swrite(buffer, bytes);
 }
 
 int Packetizer::queryBuffer()
