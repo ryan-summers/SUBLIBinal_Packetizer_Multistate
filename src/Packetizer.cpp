@@ -24,7 +24,7 @@ bool Packetizer::close()
 {
     return port->sclose();
 }
-
+static int errCnt = 0;
 int Packetizer::readPacket(char *buffer)
 {
 	char byte;
@@ -46,7 +46,9 @@ int Packetizer::readPacket(char *buffer)
                         error = ERR_NO_ERROR;
                     }
                     else
+                    {
                         error = ERR_INVALID_CTRL;
+                    }
 				}
 				else
 					error = ERR_NOT_ENOUGH_DATA;
@@ -84,8 +86,11 @@ int Packetizer::readPacket(char *buffer)
 	}
 	else
 	{
+        if (error == ERR_INVALID_CTRL)
+            errCnt++;
 		//Return current error (negative value)
 		return error;
+        std::cout << errCnt << std::endl;
 	}
 }
 

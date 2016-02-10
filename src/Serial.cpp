@@ -85,7 +85,7 @@ bool Serial::configure()
 	portConfig.c_cflag &= ~(CSTOPB); //Set 1 stop bit
 	portConfig.c_cflag &= ~(CRTSCTS); //Disable RTS CTS flow control
 
-	portConfig.c_iflag |= IGNBRK | IGNPAR | IGNCR; //ignore break, parity errors, and carriage returns
+    //portConfig.c_iflag |= IGNBRK | IGNPAR | IGNCR; //ignore break, parity errors, and carriage returns
 	portConfig.c_iflag &= ~(IXON | IXOFF | IXANY);
 
 	cfsetospeed(&portConfig, baudRate);
@@ -163,3 +163,11 @@ int Serial::queryBuffer()
 
 #endif
 
+#ifdef __linux
+int Serial::sflush()
+{
+    tcflush(this->portHandle,TCIOFLUSH);
+}
+#elif _WIN32
+
+#endif

@@ -1,5 +1,10 @@
+#ifndef PACKETIZER_H
+#define PACKETIZER_H
+
 #include "include/Serial.hpp"
 #include <string.h>
+#include <iostream>
+
 
 
 class Packetizer
@@ -44,3 +49,4 @@ private:
 	Packetizer_Error error;
 };
 
+#endif
