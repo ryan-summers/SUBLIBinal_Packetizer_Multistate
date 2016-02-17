@@ -169,5 +169,9 @@ int Serial::sflush()
     tcflush(this->portHandle,TCIOFLUSH);
 }
 #elif _WIN32
-
+int Serial::sflush()
+{
+    PurgeComm(portHandle, PURGE_RXCLEAR);
+    return 1;
+}
 #endif
