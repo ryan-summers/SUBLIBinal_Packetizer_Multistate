@@ -18,6 +18,7 @@ typedef int HANDLE; //HANDLE is used within windows. For linux, just typedef it 
 #include <windows.h> //Include the main windows header
 #include <WinBase.h>
 
+#define B115200 115200
 #endif
 
 #include <string.h>
