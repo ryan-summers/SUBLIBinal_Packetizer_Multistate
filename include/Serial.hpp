@@ -10,6 +10,7 @@ typedef int HANDLE; //HANDLE is used within windows. For linux, just typedef it 
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <linux/tty.h>
 #define INVALID_HANDLE_VALUE 0
 
 #elif _WIN32
@@ -19,9 +20,11 @@ typedef int HANDLE; //HANDLE is used within windows. For linux, just typedef it 
 
 #endif
 
+#include <string.h>
 #include <string>
 #include <stdio.h>
-	using namespace std;
+
+using namespace std;
 
 class Serial 
 {
@@ -36,6 +39,7 @@ class Serial
 		int swrite(char *buffer, int bytes); //Write data to the port
         int sflush(); //flush the buffer
 		int queryBuffer(); //Query how many bytes are available on the port
+        int setRTS(int state); //Set the RTS to the specified state
 
 	protected:
 		bool configure();

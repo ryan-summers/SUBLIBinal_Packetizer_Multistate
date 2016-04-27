@@ -69,9 +69,14 @@ int Packetizer::readPacket(char *buffer)
 			case READ_SIZE:
 				if (port->queryBuffer() >= packetSize)
 				{
-					port->sread(buffer, packetSize);
-					complete = true;
-					error = ERR_NO_ERROR;
+                    int cnt = port->sread(buffer, packetSize);
+                    if (cnt == packetSize)
+                    {
+                        complete = true;
+                        error = ERR_NO_ERROR;
+                    }
+                    else
+                        error = ERR_NOT_ENOUGH_DATA;
 				}
 				else
 					error = ERR_NOT_ENOUGH_DATA;

@@ -2,7 +2,7 @@
 
 Serial::Serial(string portName, int baudRate)
 {
-	portHandle = NULL;
+    portHandle = 0;
 	this->portName = portName;
 	this->baudRate = baudRate;
 }
@@ -11,7 +11,6 @@ Serial::~Serial()
 {
 	this->sclose();
 }
-
 
 int Serial::sread(char *buffer, int bytes)
 {
@@ -68,7 +67,9 @@ bool Serial::sopen()
 
 bool Serial::configure()
 {
-	struct termios portConfig = {0}; //initialize our termios structure
+    struct termios portConfig; //initialize our termios structure
+
+    memset(&portConfig, 0, sizeof(struct termios));
 
 	if (tcgetattr(portHandle, &portConfig) != 0) {
 		printf("Get Attributes failed.\n Error: %d", errno);
@@ -85,7 +86,6 @@ bool Serial::configure()
 	portConfig.c_cflag &= ~(CSTOPB); //Set 1 stop bit
 	portConfig.c_cflag &= ~(CRTSCTS); //Disable RTS CTS flow control
 
-    //portConfig.c_iflag |= IGNBRK | IGNPAR | IGNCR; //ignore break, parity errors, and carriage returns
 	portConfig.c_iflag &= ~(IXON | IXOFF | IXANY);
 
 	cfsetospeed(&portConfig, baudRate);
@@ -166,7 +166,7 @@ int Serial::queryBuffer()
 #ifdef __linux
 int Serial::sflush()
 {
-    tcflush(this->portHandle,TCIOFLUSH);
+    return tcflush(this->portHandle,TCIOFLUSH);
 }
 #elif _WIN32
 int Serial::sflush()
@@ -175,3 +175,18 @@ int Serial::sflush()
     return 1;
 }
 #endif
+
+int Serial::setRTS(int level)
+{
+    int status = 0;
+    if (level)
+        status |= TIOCM_RTS;
+    else
+        status &= ~TIOCM_RTS;
+
+    if (ioctl(portHandle, TIOCMSET, &status) == -1)
+        return errno;
+    else
+        return 0;
+
+}
