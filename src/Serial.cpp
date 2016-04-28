@@ -178,6 +178,7 @@ int Serial::sflush()
 
 int Serial::setRTS(int level)
 {
+#ifdef __linux
     int status = 0;
     if (level)
         status |= TIOCM_RTS;
@@ -189,4 +190,13 @@ int Serial::setRTS(int level)
     else
         return 0;
 
+#elif _WIN32
+	if (level)
+		EscapeCommFunction(portHandle, SETRTS);
+	else
+		EscapeCommFunction(portHandle, CLRRTS);
+
+	return 0;
+#endif
 }
+
